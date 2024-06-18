@@ -6,10 +6,9 @@ export interface PokemonData {
 
 export interface PokemonProps {
   generationNumber?: number;
-  pokemonList: { key: number; generationNumber: number }[];
+  pokemonData: any;
   visible: boolean;
   onClick: (pokemonData: PokemonData) => void;
-  currentPokemon: any;
 }
 
 export interface ShowBallsProps {

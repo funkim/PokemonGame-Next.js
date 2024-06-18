@@ -1,4 +1,5 @@
 "use client";
+import Head from "next/head";
 import React, { useEffect, useState } from "react";
 import GetPokemon from "@/components/GetPokemon";
 import ShowBalls from "@/components/ShowBalls";
@@ -70,7 +71,7 @@ export default function App() {
       const shuffledList = Shuffle([...pokemonList]);
       setPokemonList(shuffledList);
       setVisible(true);
-    }, 1000);
+    }, 1800);
   }
 
   function resetGameData() {
