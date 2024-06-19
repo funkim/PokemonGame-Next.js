@@ -23,13 +23,13 @@ export default function GetPokemon({ pokemonData, visible, onClick }: PokemonPro
     );
 
   return (
-    <div>
+    <>
       {visible ? (
         <img src={pokemonData.sprite} alt="Pokemon Sprite" onClick={handlePokemonClick} />
       ) : (
         <img src="https://pngfre.com/wp-content/uploads/Pokeball-1.png" alt="Empty Pokemon Sprite" className="empty" />
       )}
       {pokemonData.cry && <audio ref={audioRef} src={pokemonData.cry} />}
-    </div>
+    </>
   );
 }

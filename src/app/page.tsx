@@ -1,5 +1,4 @@
 "use client";
-import Head from "next/head";
 import React, { useEffect, useState } from "react";
 import GetPokemon from "@/components/GetPokemon";
 import ShowBalls from "@/components/ShowBalls";
@@ -16,38 +15,38 @@ export default function App() {
   const [win, setWin] = useState(false);
   const [lose, setLose] = useState(false);
 
-  useEffect(() => {
-    async function fetchInitialPokemon() {
-      let initialPokemon: PokemonData[] = [];
-      if (generation && generation > 0) {
-        for (let i = 0; i < difficulty; i++) {
-          const newPokemon = await getGenerationalPokemon(
-            generation,
-            initialPokemon.map((p) => p.name)
-          );
-          initialPokemon.push(newPokemon);
-        }
-      } else {
-        for (let i = 0; i < difficulty; i++) {
-          const newPokemon = await getAllPokemon(initialPokemon.map((p) => p.name));
-          initialPokemon.push(newPokemon);
-        }
+  async function fetchPokemon(diff = difficulty, gen = generation) {
+    let initialPokemon: PokemonData[] = [];
+    if (gen && gen > 0) {
+      for (let i = 0; i < diff; i++) {
+        const newPokemon = await getGenerationalPokemon(
+          gen,
+          initialPokemon.map((p) => p.name)
+        );
+        initialPokemon.push(newPokemon);
       }
-      setPokemonList(initialPokemon);
+    } else {
+      for (let i = 0; i < diff; i++) {
+        const newPokemon = await getAllPokemon(initialPokemon.map((p) => p.name));
+        initialPokemon.push(newPokemon);
+      }
     }
+    setPokemonList(initialPokemon);
+  }
 
-    fetchInitialPokemon();
-  }, [generation, difficulty]);
+  useEffect(() => {
+    fetchPokemon();
+  }, [difficulty, generation]);
 
   function winHandler() {
     setWin(true);
+    setClickedPokemon([]);
   }
 
   function lostHandler() {
     setScore(0);
-    setWin(false);
     setLose(true);
-    resetGameData();
+    setClickedPokemon([]);
   }
 
   function handlePokemonClick(pokemonData: PokemonData) {
@@ -64,8 +63,6 @@ export default function App() {
 
     setClickedPokemon([...clickedPokemon, pokemonData]);
 
-    // hide pokemon shuffle list then show them again
-
     setVisible(false);
     setTimeout(() => {
       const shuffledList = Shuffle([...pokemonList]);
@@ -76,6 +73,7 @@ export default function App() {
 
   function resetGameData() {
     setClickedPokemon([]);
+    setPokemonList([]);
     setWin(false);
     setLose(false);
     setScore(0);
@@ -83,13 +81,15 @@ export default function App() {
   }
 
   function handleGenerationClick(gen: number) {
-    setGeneration(gen);
     resetGameData();
+    setGeneration(gen);
+    fetchPokemon(difficulty, gen);
   }
 
   function changeDifficulty(diff: number) {
     setDifficulty(diff);
     resetGameData();
+    fetchPokemon(diff, generation);
   }
 
   return (
@@ -116,9 +116,11 @@ export default function App() {
           <input key={diff} type="button" onClick={() => changeDifficulty(diff)} value={diff === 3 ? "Easy" : diff === 6 ? "Normal" : "Hard"} />
         ))}
       </div>
-      {pokemonList.map((pokemonData, index) => (
-        <GetPokemon key={index} pokemonData={pokemonData} visible={visible} onClick={handlePokemonClick} />
-      ))}
+      <div className="Pokemon">
+        {pokemonList.map((pokemonData, index) => (
+          <GetPokemon key={index} pokemonData={pokemonData} visible={visible} onClick={handlePokemonClick} />
+        ))}
+      </div>
     </div>
   );
 }

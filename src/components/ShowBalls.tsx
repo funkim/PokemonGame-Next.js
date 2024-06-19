@@ -2,7 +2,7 @@ import { ShowBallsProps } from "./types";
 
 function ShowBalls({ score, difficulty }: ShowBallsProps) {
   const balls = [];
-  // Add filled Poké Balls based on the score
+  // Add filled poke balls based on the score
   for (let i = 0; i < score; i++) {
     balls.push(
       <img
@@ -13,7 +13,7 @@ function ShowBalls({ score, difficulty }: ShowBallsProps) {
       />
     );
   }
-  // Add empty Poké Balls based on the remaining difficulty
+  // Add empty poke balls based on the remaining difficulty
   for (let i = score; i < difficulty; i++) {
     balls.push(
       <img
