@@ -1,9 +1,9 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import GetPokemon from "@/components/GetPokemon";
-import ShowBalls from "@/components/ShowBalls";
-import { PokemonData } from "@/components/types";
-import { getAllPokemon, getGenerationalPokemon } from "@/components/pokemonCatching";
+'use client';
+import React, { useEffect, useState } from 'react';
+import GetPokemon from '@/components/GetPokemon';
+import ShowBalls from '@/components/ShowBalls';
+import { PokemonData } from '@/components/types';
+import { getAllPokemon, getGenerationalPokemon } from '@/components/pokemonCatching';
 
 export default function App() {
   const [generation, setGeneration] = useState(0);
@@ -93,8 +93,8 @@ export default function App() {
   }
 
   return (
-    <div className="container">
-      <div className="gamestate">
+    <div className="">
+      <div className="">
         <h2>
           Score: {score} / {difficulty}
         </h2>
@@ -106,17 +106,17 @@ export default function App() {
       <div className="all">
         <input type="button" onClick={() => handleGenerationClick(0)} value="Everyone!" />
       </div>
-      <div className="generations">
+      <div className="">
         {[1, 2, 3, 4, 5, 6, 7].map((gen) => (
           <input key={gen} type="button" onClick={() => handleGenerationClick(gen)} value={`Generation ${gen}`} />
         ))}
       </div>
-      <div className="difficulties">
+      <div className="">
         {[3, 6, 10].map((diff) => (
-          <input key={diff} type="button" onClick={() => changeDifficulty(diff)} value={diff === 3 ? "Easy" : diff === 6 ? "Normal" : "Hard"} />
+          <input key={diff} type="button" onClick={() => changeDifficulty(diff)} value={diff === 3 ? 'Easy' : diff === 6 ? 'Normal' : 'Hard'} />
         ))}
       </div>
-      <div className="Pokemon">
+      <div className="ccolor-bg">
         {pokemonList.map((pokemonData, index) => (
           <GetPokemon key={index} pokemonData={pokemonData} visible={visible} onClick={handlePokemonClick} />
         ))}
