@@ -7,20 +7,26 @@ function ShowBalls({ score, difficulty }: ShowBallsProps) {
     balls.push(
       <img
         key={`filled-${i}`}
-        src="https://p1.hiclipart.com/preview/742/695/612/pokeball-pokeball-illustraion-png-clipart.jpg"
+        src="https://upload.wikimedia.org/wikipedia/commons/5/53/Pok%C3%A9_Ball_icon.svg"
         alt="Poké Ball"
-        style={{ width: '50px', height: '50px', margin: '5px' }}
+        className="h-6 w-6 md:h-10 md:w-10 mx-1"
       />
     );
   }
+
   // Add empty poke balls based on the remaining difficulty
   for (let i = score; i < difficulty; i++) {
     balls.push(
-      <img key={`empty-${i}`} src="https://p1.hiclipart.com/preview/742/695/612/pokeball-pokeball-illustraion-png-clipart.jpg" alt="Poké Ball" />
+      <img
+        key={`empty-${i}`}
+        src="https://upload.wikimedia.org/wikipedia/commons/5/53/Pok%C3%A9_Ball_icon.svg"
+        alt="Empty Poké Ball"
+        className="h-6 w-6 md:h-10 md:w-10 mx-1 grayscale"
+      />
     );
   }
 
-  return <div className="bg">{balls}</div>;
+  return <div className="flex  justify-center ">{balls}</div>;
 }
 
 export default ShowBalls;
