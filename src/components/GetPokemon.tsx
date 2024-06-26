@@ -15,13 +15,6 @@ export default function GetPokemon({ pokemonData, visible, onClick }: PokemonPro
     }
   }
 
-  if (!pokemonData)
-    return (
-      <div>
-        <p>Loading... </p>
-      </div>
-    );
-
   return (
     <>
       {visible ? (

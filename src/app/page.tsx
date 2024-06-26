@@ -80,6 +80,7 @@ export default function App() {
     setLose(false);
     setScore(0);
     setVisible(true);
+    fetchPokemon(difficulty, currentGenIndex);
   }
 
   function changeDifficulty(diff: number, gen: number) {
@@ -108,7 +109,8 @@ export default function App() {
         <div className="flex flex-wrap mx-4 md:mx-20 items-center justify-center gap-5">
           <ShowBalls score={score} difficulty={difficulty} />
           <button
-            onClick={() => getAllGenerations(difficulty, currentGenIndex)}
+            type="reset"
+            onClick={() => resetGameData()}
             className="ml-4 px-3 py-1 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition-colors duration-200"
           >
             Reset
@@ -167,7 +169,7 @@ export default function App() {
         <div className="flex flex-wrap justify-center gap-8 w-full px-4">
           {pokemonList.map((pokemonData, index) => (
             <div key={index} className="bg-pink-200 hover:bg-red-600 rounded-full p-4">
-              <GetPokemon pokemonData={pokemonData} visible={visible} onClick={handlePokemonClick} />
+              {GetPokemon ? <GetPokemon pokemonData={pokemonData} visible={visible} onClick={handlePokemonClick} /> : <p>Loading...</p>}
             </div>
           ))}
         </div>
