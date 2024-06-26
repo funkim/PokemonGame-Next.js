@@ -26,7 +26,7 @@ function ShowBalls({ score, difficulty }: ShowBallsProps) {
     );
   }
 
-  return <div className="flex  justify-center ">{balls}</div>;
+  return <div className="flex justify-center flex-wrap max-w-60 ">{balls}</div>;
 }
 
 export default ShowBalls;

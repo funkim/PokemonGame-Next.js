@@ -1,4 +1,4 @@
-import { PokemonData } from "./types";
+import { PokemonData } from './types';
 
 async function fetchWithRetry(url: string, retries: number = 3): Promise<any> {
   for (let i = 0; i < retries; i++) {
@@ -22,8 +22,8 @@ export async function getGenerationalPokemon(generation: number, currentPokemon:
 
     if (!currentPokemon.includes(pokemonName)) {
       const thisPokemonData = await fetchWithRetry(`https://pokeapi.co/api/v2/pokemon/${pokemonName}/`);
-      const pokemonSprite = thisPokemonData.sprites.other["official-artwork"].front_default
-        ? thisPokemonData.sprites.other["official-artwork"].front_default
+      const pokemonSprite = thisPokemonData.sprites.other['official-artwork'].front_default
+        ? thisPokemonData.sprites.other['official-artwork'].front_default
         : thisPokemonData.sprites.front_default;
       const pokemonCry = thisPokemonData.cries?.latest || null;
 
@@ -50,8 +50,8 @@ export async function getAllPokemon(currentPokemon: string[]): Promise<PokemonDa
 
     if (!currentPokemon.includes(pokemonName)) {
       const thisPokemonData = await fetchWithRetry(`https://pokeapi.co/api/v2/pokemon/${pokemonName}/`);
-      const pokemonSprite = thisPokemonData.sprites.other["official-artwork"].front_default
-        ? thisPokemonData.sprites.other["official-artwork"].front_default
+      const pokemonSprite = thisPokemonData.sprites.other['official-artwork'].front_default
+        ? thisPokemonData.sprites.other['official-artwork'].front_default
         : thisPokemonData.sprites.front_default;
       const pokemonCry = thisPokemonData.cries?.latest || null;
 
