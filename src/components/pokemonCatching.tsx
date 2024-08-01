@@ -1,16 +1,18 @@
 import { PokemonData } from './types';
 
-async function fetchWithRetry(url: string, retries: number = 3): Promise<any> {
+export async function fetchWithRetry(url: string, retries: number = 3): Promise<any> {
   for (let i = 0; i < retries; i++) {
     try {
       const response = await fetch(url);
-      if (!response.ok) throw new Error(`Fetch failed with status ${response.status}`);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       return await response.json();
-    } catch (error: any) {
-      console.error(`Fetch attempt ${i + 1} failed: ${error.message}`);
+    } catch (error) {
+      console.error(`Attempt ${i + 1} failed: ${error instanceof Error ? error.message : String(error)}`);
       if (i === retries - 1) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1 second before retrying
     }
   }
+  throw new Error('Max retries reached');
 }
 
 export async function getGenerationalPokemon(generation: number, currentPokemon: string[]): Promise<PokemonData> {

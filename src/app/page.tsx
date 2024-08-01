@@ -1,9 +1,10 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import GetPokemon from '@/components/GetPokemon';
 import ShowBalls from '@/components/ShowBalls';
 import { PokemonData } from '@/components/types';
 import { getAllPokemon, getGenerationalPokemon } from '@/components/pokemonCatching';
+import { fetchWithRetry } from '@/components/pokemonCatching';
 
 export default function App() {
   const [difficulty, setDifficulty] = useState(6);
@@ -14,41 +15,70 @@ export default function App() {
   const [win, setWin] = useState(false);
   const [lose, setLose] = useState(false);
   const [currentGenIndex, setCurrentGenIndex] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
 
   const generations = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-  async function fetchPokemon(diff = difficulty, gen = currentGenIndex) {
-    let initialPokemon: PokemonData[] = [];
-    if (gen && gen > 0) {
-      for (let i = 0; i < diff; i++) {
-        const newPokemon = await getGenerationalPokemon(
-          gen,
-          initialPokemon.map((p) => p.name)
-        );
-        initialPokemon.push(newPokemon);
+  const fetchPokemon = useCallback(async (diff: number, gen: number) => {
+    setIsLoading(true);
+    try {
+      let initialPokemon: PokemonData[] = [];
+      if (gen && gen > 0) {
+        for (let i = 0; i < diff; i++) {
+          const newPokemon = await getGenerationalPokemon(
+            gen,
+            initialPokemon.map((p) => p.name)
+          );
+          initialPokemon.push(newPokemon);
+        }
+      } else {
+        for (let i = 0; i < diff; i++) {
+          const newPokemon = await getAllPokemon(initialPokemon.map((p) => p.name));
+          initialPokemon.push(newPokemon);
+        }
       }
-    } else {
-      for (let i = 0; i < diff; i++) {
-        const newPokemon = await getAllPokemon(initialPokemon.map((p) => p.name));
-        initialPokemon.push(newPokemon);
-      }
+      setPokemonList(initialPokemon);
+    } catch (error) {
+      console.error('Failed to fetch Pokémon:', error);
+    } finally {
+      setIsLoading(false);
     }
-    setPokemonList(initialPokemon);
-  }
+  }, []);
 
   useEffect(() => {
-    fetchPokemon();
-  }, [difficulty, currentGenIndex]);
+    fetchPokemon(difficulty, currentGenIndex);
+  }, [difficulty, currentGenIndex, fetchPokemon]);
 
-  function winHandler() {
-    setWin(true);
+  function resetGameData() {
     setClickedPokemon([]);
+    setPokemonList([]);
+    setWin(false);
+    setLose(false);
+    setScore(0);
+    setVisible(true);
   }
 
-  function lostHandler() {
-    setScore(0);
-    setLose(true);
-    setClickedPokemon([]);
+  async function changeDifficulty(diff: number, gen: number) {
+    setIsLoading(true);
+    resetGameData();
+    setDifficulty(diff);
+    setCurrentGenIndex(gen);
+    await fetchPokemon(diff, gen);
+    setIsLoading(false);
+  }
+
+  function getAllGenerations(diff: number, gen: number) {
+    resetGameData();
+    setCurrentGenIndex(0);
+    fetchPokemon(diff, gen);
+  }
+
+  function handleNextGen() {
+    setCurrentGenIndex((prevIndex) => (prevIndex + 1) % generations.length);
+  }
+
+  function handlePrevGen() {
+    setCurrentGenIndex((prevIndex) => (prevIndex - 1 + generations.length) % generations.length);
   }
 
   function handlePokemonClick(pokemonData: PokemonData) {
@@ -73,34 +103,15 @@ export default function App() {
     }, 1800);
   }
 
-  function resetGameData() {
+  function winHandler() {
+    setWin(true);
     setClickedPokemon([]);
-    setPokemonList([]);
-    setWin(false);
-    setLose(false);
+  }
+
+  function lostHandler() {
     setScore(0);
-    setVisible(true);
-    fetchPokemon(difficulty, currentGenIndex);
-  }
-
-  function changeDifficulty(diff: number, gen: number) {
-    resetGameData();
-    setDifficulty(diff);
-    fetchPokemon(diff, gen);
-  }
-
-  function getAllGenerations(diff: number, gen: number) {
-    resetGameData();
-    setCurrentGenIndex(0);
-    fetchPokemon(diff, gen);
-  }
-
-  function handleNextGen() {
-    setCurrentGenIndex((prevIndex) => (prevIndex + 1) % generations.length);
-  }
-
-  function handlePrevGen() {
-    setCurrentGenIndex((prevIndex) => (prevIndex - 1 + generations.length) % generations.length);
+    setLose(true);
+    setClickedPokemon([]);
   }
 
   return (
@@ -127,6 +138,7 @@ export default function App() {
                 className={`px-3 py-1 rounded-lg shadow-md transition-colors duration-200 text-sm ${
                   diff === difficulty ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
                 } hover:bg-blue-600 hover:text-white`}
+                disabled={isLoading}
               >
                 {diff === 3 ? 'Easy' : diff === 6 ? 'Normal' : 'Hard'}
               </button>
@@ -166,13 +178,17 @@ export default function App() {
       </header>
 
       <main className="flex flex-wrap justify-center items-center my-10 w-screen">
-        <div className="flex flex-wrap justify-center gap-8 w-full px-4">
-          {pokemonList.map((pokemonData, index) => (
-            <div key={index} className="bg-pink-200 hover:bg-red-600 rounded-full p-4">
-              {GetPokemon ? <GetPokemon pokemonData={pokemonData} visible={visible} onClick={handlePokemonClick} /> : <p>Loading...</p>}
-            </div>
-          ))}
-        </div>
+        {isLoading ? (
+          <p>Loading...</p>
+        ) : (
+          <div className="flex flex-wrap justify-center gap-8 w-full px-4">
+            {pokemonList.map((pokemonData, index) => (
+              <div key={index} className="bg-pink-200 hover:bg-red-600 rounded-full p-4">
+                {GetPokemon ? <GetPokemon pokemonData={pokemonData} visible={visible} onClick={handlePokemonClick} /> : <p>Loading...</p>}
+              </div>
+            ))}
+          </div>
+        )}
       </main>
     </>
   );
